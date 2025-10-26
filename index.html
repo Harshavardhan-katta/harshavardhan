@@ -41,10 +41,9 @@
         <section id="home" class="home-section">
             <div class="home-content">
                 <h1>Katta Harsha Vardhan</h1>
-                <p>I'm a B.tech 2nd Year Student |<span class="typing-text"></span></p>
+                <p>I'm a B.tech  Student |<span class="typing-text"></span></p>
                 <div class="buttons">
-                    <a href="https://drive.google.com/file/d/1jtYYngVpIZPBVNY0RY53rd_g6vOawejZ/view?usp=sharing" target="_blank" class="btn">Download CV</a>
-
+                    <a id="cv-btn" href="https://drive.google.com/file/d/1jtYYngVpIZPBVNY0RY53rd_g6vOawejZ/view?usp=sharing" target="_blank" class="btn">Download CV</a>
                     <a href="#contact" class="btn btn-secondary">Contact Me</a>
                 </div>
             </div>
@@ -62,6 +61,7 @@
                 </p>
             </div>
         </section>
+
         <!-- Skills Section -->
         <section id="skills" class="content-section">
             <h2 class="section-title">My Skills</h2>
@@ -87,12 +87,7 @@
                     <img src="https://upload.wikimedia.org/wikipedia/en/3/30/Java_programming_language_logo.svg" alt="React logo" class="skill-logo">
                     <h3>Java</h3>
                 </div>
-
-        <!-- Skills Section -->
-        <section id="skills" class="content-section">
-            <h2 class="section-title">My Skills</h2>
-            <div id="skills-container" class="skills-grid">
-                <!-- Skills will be dynamically loaded here -->
+                <!-- Skills from Firebase will be loaded here -->
             </div>
         </section>
 
@@ -100,7 +95,23 @@
         <section id="projects" class="content-section">
             <h2 class="section-title">My Projects</h2>
             <div id="projects-container" class="projects-grid">
-                <!-- Projects will be dynamically loaded here -->
+                <!-- Default project with gallery (fallback) -->
+                <div class="project-card static-content">
+                    <img src="https://via.placeholder.com/400x200/6a11cb/ffffff?text=Sample+Project" alt="Sample Project" class="project-image">
+                    <div class="card-content">
+                        <h3>Sample Project with Gallery</h3>
+                        <p>This is a default project card that demonstrates the image gallery feature. When you add your own projects from the admin panel, this will be replaced.</p>
+                        <button 
+                            class="btn btn-gallery" 
+                            onclick="openGallery(['https://via.placeholder.com/800x600/6a11cb/ffffff?text=Gallery+Image+1', 'https://via.placeholder.com/800x600/2575fc/ffffff?text=Gallery+Image+2', 'https://via.placeholder.com/800x600/333333/ffffff?text=Gallery+Image+3'])">
+                            View Gallery
+                        </button>
+                        <a href="https://github.com/Harshavardhan-katta" target="_blank">
+                            View on GitHub <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                </div>
+                <!-- Projects from Firebase will be loaded here -->
             </div>
         </section>
 
@@ -163,9 +174,3 @@
 <style>
 
 </style>
-
-
-
-
-
-
