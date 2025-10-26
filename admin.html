@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="admin-body">
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Login Section -->
+    <div id="login-section" class="admin-container">
+        <h2>Admin Login</h2>
+        <form id="login-form">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit" class="btn">Login</button>
+        </form>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div id="dashboard-section" style="display: none;">
+        <header class="dashboard-header">
+            <h1>Admin Dashboard</h1>
+            <button id="logout-btn" class="btn btn-secondary">Logout</button>
+        </header>
+
+        <main class="dashboard-main">
+            <!-- Skills Management -->
+            <section class="dashboard-card">
+                <h3>Manage Skills</h3>
+                <form id="skill-form">
+                    <input type="hidden" id="skill-id">
+                    <input type="text" id="skill-name" placeholder="Skill Name (e.g., JavaScript)" required>
+                    <input type="number" id="skill-level" placeholder="Proficiency Level (1-100)" min="1" max="100" required>
+                    <label for="skill-logo">Skill Logo (optional, overwrites existing)</label>
+                    <input type="file" id="skill-logo" accept="image/*">
+                    <button type="submit" class="btn">Add/Update Skill</button>
+                </form>
+                <div id="skills-list" class="items-list"></div>
+            </section>
+
+            <!-- Projects Management -->
+            <section class="dashboard-card">
+                <h3>Manage Projects</h3>
+                <form id="project-form">
+                    <input type="hidden" id="project-id">
+                    <input type="text" id="project-title" placeholder="Project Title" required>
+                    <textarea id="project-desc" placeholder="Project Description" required></textarea>
+                    <input type="url" id="project-link" placeholder="Project Link (e.g., https://github.com/...)" required>
+                    <label for="project-image">Project Images (optional, will replace existing)</label>
+                    <input type="file" id="project-image" accept="image/*" multiple>
+                    <button type="submit" class="btn">Add/Update Project</button>
+                </form>
+                <div id="projects-list" class="items-list"></div>
+            </section>
+
+            <!-- General Settings -->
+            <section class="dashboard-card">
+                <h3>General Settings</h3>
+                <form id="resume-form">
+                    <label for="resume-file">Upload New Resume</label>
+                    <input type="file" id="resume-file" accept=".pdf,.doc,.docx">
+                    <button type="submit" class="btn">Update Resume</button>
+                </form>
+                <hr style="margin: 20px 0;">
+                <form id="profile-image-form">
+                    <label for="profile-image-file">Upload New Profile Picture</label>
+                    <input type="file" id="profile-image-file" accept="image/*">
+                    <button type="submit" class="btn">Update Picture</button>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>

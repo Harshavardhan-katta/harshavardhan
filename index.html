@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katta Harsha Vardhan | Portfolio</title>
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💼</text></svg>">
+    <link rel="stylesheet" href="style.css">    
+    <!-- Google Fonts: Poppins and Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Header & Navigation -->
+    <header>
+        <a href="#home" class="logo">HarshaVardhan</a>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+        <button id="menu-btn" class="fas fa-bars"></button>
+    </header>
+
+    <main>
+        <!-- Home Section -->
+        <section id="home" class="home-section">
+            <div class="home-content">
+                <h1>Katta Harsha Vardhan</h1>
+                <p>I'm a B.tech 2nd Year Student |<span class="typing-text"></span></p>
+                <div class="buttons">
+                    <a id="cv-btn" href="resume.pdf" target="_blank" class="btn">Download CV</a>
+                    <a href="#contact" class="btn btn-secondary">Contact Me</a>
+                </div>
+            </div>
+            <div class="home-img">
+                <img id="home-profile-img" src="harsha.jpg" alt="Katta Harsha Vardhan">
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="about-section content-section">
+            <h2 class="section-title">About Me</h2>
+            <div class="about-content">
+                <p>
+                    Hello! I'm Harsha, a passionate B.Tech CSE student specializing in AI & Machine Learning. My journey in technology is driven by a fascination with building intelligent systems and creating seamless user experiences. From developing predictive models to designing responsive websites, I love bringing creative and impactful projects to life. I am constantly exploring new technologies and am always eager to collaborate on innovative solutions.
+                </p>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="content-section">
+            <h2 class="section-title">My Skills</h2>
+            <div id="skills-container" class="skills-grid">
+                <!-- Skills will be dynamically loaded here -->
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="content-section">
+            <h2 class="section-title">My Projects</h2>
+            <div id="projects-container" class="projects-grid">
+                <!-- Projects will be dynamically loaded here -->
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="content-section">
+            <h2 class="section-title">Get In Touch</h2>
+            <div class="contact-container">
+                <div class="contact-info">
+                    <p>I'm currently open to new opportunities and collaborations. Feel free to reach out!</p>
+                    <a href="mailto:harshavardhankatta5@outlook.com" class="btn"><i class="fas fa-envelope"></i> Email Me</a>
+                    <div class="social-links">
+                        <a href="https://github.com/Harshavardhan-katta" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                        <a href="https://www.linkedin.com/in/katta-harshavardhan" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://www.instagram.com/harsha_vardhankatta" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <form id="contact-form" class="contact-form">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                    <input type="email" name="email" placeholder="Your Email" required>
+                    <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
+                    <button type="submit" class="btn">Send Message</button>
+                    <div id="form-status"></div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>Copyright &copy; 2025 Harsha Vardhan. All Rights Reserved.</p>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#" id="back-to-top" class="fas fa-arrow-up"></a>    
+
+    <!-- Image Gallery Modal -->
+    <div id="gallery-modal" class="modal">
+        <span class="close-modal">&times;</span>
+        <div class="modal-content">
+            <div class="modal-images">
+                <!-- Images will be injected here by JavaScript -->
+            </div>
+            <a class="prev">&#10094;</a>
+            <a class="next">&#10095;</a>
+        </div>
+    </div>
+
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+<style>
+
+</style>
