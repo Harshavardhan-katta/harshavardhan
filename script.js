@@ -63,6 +63,36 @@ document.addEventListener('DOMContentLoaded', () => {
 //
 // ===================================================================================
 
+// --- DEFAULT DATA (FALLBACK) ---
+const defaultSkills = [
+    { id: 'default-js', name: 'JavaScript', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png' },
+    { id: 'default-html', name: 'HTML5', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/61/HTML5_logo_and_wordmark.svg' },
+    { id: 'default-css', name: 'CSS3', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/3d/CSS.3.svg' },
+    { id: 'default-react', name: 'React', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg' },
+    { id: 'default-firebase', name: 'Firebase', logoUrl: 'https://www.gstatic.com/devrel-devsite/prod/v857595300a87c7e04314232241e975453df6a21814252443423c686d82d4af44/firebase/images/touchicon-180.png' }
+];
+
+const defaultProjects = [
+    {
+        id: 'default-p1',
+        title: 'Sample Project One',
+        description: 'This is a great sample project showcasing web development skills. It includes a gallery with multiple images.',
+        link: 'https://github.com/Harshavardhan-katta',
+        imageUrls: [
+            'https://via.placeholder.com/400x200/6a11cb/ffffff?text=Image+1',
+            'https://via.placeholder.com/800x600/2575fc/ffffff?text=Gallery+Image+2',
+            'https://via.placeholder.com/800x600/333333/ffffff?text=Gallery+Image+3'
+        ]
+    },
+    {
+        id: 'default-p2',
+        title: 'Sample Project Two',
+        description: 'Another example of a project, this one demonstrates a different set of capabilities and has a single cover image.',
+        link: 'https://github.com/Harshavardhan-katta',
+        imageUrls: ['https://via.placeholder.com/400x200/e83e8c/ffffff?text=Project+Two']
+    }
+];
+
 /**
  * Initializes all functionality for the main portfolio page.
  */
@@ -74,11 +104,21 @@ function initIndexPage() {
     setupTypingAnimation(); // Start the typing animation last.
     loadPublicData();
 
+    // --- RENDER DEFAULTS IMMEDIATELY ---
+    // We now use static HTML for all default content. The JS will only
+    // render content if it's successfully loaded from Firebase.
+    // The following lines are removed to prevent overwriting the static HTML.
+    // renderSkills(defaultSkills); 
+    // renderProjects(defaultProjects);
+
     // --- FIREBASE REAL-TIME LISTENERS ---
     db.collection('skills').orderBy('name').onSnapshot(snapshot => {
         try {
             const skills = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderSkills(skills);
+            if (skills.length > 0) {
+                document.getElementById('skills-container').innerHTML = ''; // Clear static skills
+                renderSkills(skills);
+            }
         } catch (error) {
             console.error("Error rendering skills from Firestore snapshot:", error);
         }
@@ -86,10 +126,16 @@ function initIndexPage() {
         console.error("Firestore skills listener error:", error);
     });
 
+    
     db.collection('projects').onSnapshot(snapshot => {
         try {
             const projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderProjects(projects);
+            // If Firestore has projects, show them. Otherwise, the defaults remain.
+            if (projects.length > 0) {
+                // Clear static projects only if we have data from the database.
+                document.getElementById('projects-container').innerHTML = '';
+                renderProjects(projects);
+            }
         } catch (error) {
             console.error("Error rendering projects from Firestore snapshot:", error);
         }
@@ -283,13 +329,13 @@ function renderSkills(skills) {
         console.error('Skills container element with ID "skills-container" not found! Cannot load skills.');
         return;
     }
-    // Clear only dynamically loaded skills, keeping static ones
-    skillsContainer.querySelectorAll('.dynamic-skill').forEach(el => el.remove());
-
-    // If there are no skills from Firebase and the container is empty, show a message.
-    if (skills.length === 0 && skillsContainer.children.length === 0) {
-        skillsContainer.innerHTML = '<p>Skills will be listed here soon.</p>';
+    // The container is now cleared inside the Firebase listener to protect static content.
+    if (skills.length === 0) {
+        // If the function is called with no skills, do nothing.
+        // This prevents it from overwriting the static HTML fallback.
+        return;
     }
+
     skills.forEach(skill => {
         const skillCard = document.createElement('div');
         skillCard.className = 'skill-card dynamic-skill';
@@ -334,10 +380,10 @@ function renderProjects(projects) {
         console.error('Projects container element with ID "projects-container" not found! Cannot load projects.');
         return;
     }
-    projectsContainer.innerHTML = ''; // Clear existing projects
+    // The container is now cleared inside the Firebase listener to protect static content.
     if (projects.length === 0) {
-        projectsContainer.innerHTML = '<p>Projects will be showcased here soon.</p>';
-        console.log('No projects found, displaying placeholder.'); // Debug log
+        // If the function is called with no projects, do nothing.
+        // This prevents it from overwriting the static HTML fallback.
         return;
     }
     projects.forEach(project => {
@@ -895,3 +941,4 @@ async function uploadFile(file, path) {
         return null;
     }
 }
+
