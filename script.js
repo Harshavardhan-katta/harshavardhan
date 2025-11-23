@@ -116,7 +116,7 @@ function initIndexPage() {
         try {
             const skills = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             if (skills.length > 0) {
-                document.getElementById('skills-container').innerHTML = ''; // Clear static skills
+                // No longer need to clear static skills as they are removed from HTML
                 renderSkills(skills);
             }
         } catch (error) {
@@ -132,8 +132,7 @@ function initIndexPage() {
             const projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             // If Firestore has projects, show them. Otherwise, the defaults remain.
             if (projects.length > 0) {
-                // Clear static projects only if we have data from the database.
-                document.getElementById('projects-container').innerHTML = '';
+                // No longer need to clear static projects as they are removed from HTML
                 renderProjects(projects);
             }
         } catch (error) {
@@ -349,7 +348,13 @@ function renderSkills(skills) {
         skillLogo.alt = `${skill.name} logo`;
         skillLogo.className = 'skill-logo';
 
-        skillCard.append(skillLogo, skillName);
+        // Create an element for the proficiency level
+        const skillLevel = document.createElement('p');
+        skillLevel.className = 'skill-level-display';
+        // Use the level from the skill data, fallback to 'N/A' if not present
+        skillLevel.textContent = skill.level ? `${skill.level}%` : 'N/A';
+
+        skillCard.append(skillLogo, skillName, skillLevel);
         skillsContainer.appendChild(skillCard);
         console.log(`Added skill: ${skill.name}`); // Debug log
     });
@@ -386,6 +391,7 @@ function renderProjects(projects) {
         // This prevents it from overwriting the static HTML fallback.
         return;
     }
+    projectsContainer.innerHTML = ''; // Clear existing projects before rendering new ones
     projects.forEach(project => {
         const projectCard = document.createElement('div');
         projectCard.className = 'project-card';
@@ -530,6 +536,7 @@ function showSlides(n) {
     for (let i = 0; i < slides.length; i++) {
         slides[i].style.display = 'none';
     }
+    slides[slideIndex - 1].style.display = 'block';
 }
 
 // ===================================================================================
@@ -601,9 +608,10 @@ function setupAdminEventListeners() {
     document.getElementById('projects-list')?.addEventListener('click', (e) => {
         const button = e.target.closest('button');
         if (!button) return;
-        const { action, id, title, description, link } = button.dataset;
+        const { action, id } = button.dataset;
         if (action === 'edit') {
-            editProject(id, title, description, link);
+            // We pass only the ID and fetch the full project data
+            editProject(id);
         } else if (action === 'delete') {
             deleteProject(id);
         }
@@ -654,18 +662,18 @@ async function handleSkillSubmit(e) {
     const form = e.target;
     const submitBtn = form.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Uploading...';
+    submitBtn.textContent = 'Saving...';
 
     try {
         const id = document.getElementById('skill-id').value;
         const name = document.getElementById('skill-name').value;
         const level = document.getElementById('skill-level').value;
-        const logoFile = document.getElementById('skill-logo').files[0];
+        const logoUrl = document.getElementById('skill-logo-url').value;
         const skillData = { name, level: Number(level) };
 
-        if (logoFile) {
-            const logoUrl = await uploadFile(logoFile, `skill-logos/${logoFile.name}`);
-            if (logoUrl) skillData.logoUrl = logoUrl;
+        // Only add the logoUrl if a value was provided
+        if (logoUrl) {
+            skillData.logoUrl = logoUrl;
         }
 
         if (id) {
@@ -739,24 +747,23 @@ async function handleProjectSubmit(e) {
     const form = e.target;
     const submitBtn = form.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Uploading...';
+    submitBtn.textContent = 'Saving...';
 
     try {
         const id = document.getElementById('project-id').value;
         const title = document.getElementById('project-title').value;
         const description = document.getElementById('project-desc').value;
         const link = document.getElementById('project-link').value;
-        const imageFile = document.getElementById('project-image').files[0];
-        const imageFiles = document.getElementById('project-image').files;
+        const imageUrlsText = document.getElementById('project-image-urls').value;
         const projectData = { title, description, link };
 
-        if (imageFiles.length > 0) {
-            const uploadPromises = Array.from(imageFiles).map(file =>
-                uploadFile(file, `project-images/${file.name}`)
-            );
-            const imageUrls = await Promise.all(uploadPromises);
-            // Only add URLs that were successfully uploaded
-            projectData.imageUrls = imageUrls.filter(url => url !== null);
+        // If the user entered any URLs, split them by newline, trim whitespace, and filter out empty lines.
+        if (imageUrlsText) {
+            const imageUrls = imageUrlsText
+                .split('\n')
+                .map(url => url.trim())
+                .filter(url => url.length > 0);
+            projectData.imageUrls = imageUrls;
         }
 
         if (id) {
@@ -812,16 +819,28 @@ function renderProjectsList(projects) {
     });
 }
 
-function editProject(id, title, description, link) {
+async function editProject(id) {
     const idField = document.getElementById('project-id');
     const titleField = document.getElementById('project-title');
     const descField = document.getElementById('project-desc');
     const linkField = document.getElementById('project-link');
+    const imageUrlsField = document.getElementById('project-image-urls');
 
-    if (idField) idField.value = id;
-    if (titleField) titleField.value = title;
-    if (descField) descField.value = description;
-    if (linkField) linkField.value = link;
+    try {
+        const project = await getFromFirestore('projects', id);
+        if (project) {
+            if (idField) idField.value = id;
+            if (titleField) titleField.value = project.title || '';
+            if (descField) descField.value = project.description || '';
+            if (linkField) linkField.value = project.link || '';
+            // Join the array of URLs into a string with newlines for the textarea
+            if (imageUrlsField && project.imageUrls) {
+                imageUrlsField.value = project.imageUrls.join('\n');
+            }
+        }
+    } catch (error) {
+        console.error("Error fetching project for editing:", error);
+    }
 }
 
 function deleteProject(id) {
@@ -835,21 +854,22 @@ async function handleResumeSubmit(e) {
     e.preventDefault();
     const form = e.target;
     const submitBtn = form.querySelector('button[type="submit"]');
-    const resumeFile = document.getElementById('resume-file').files[0];
+    const resumeLink = document.getElementById('resume-link').value;
 
-    if (!resumeFile) {
-        alert('Please select a resume file to upload.');
+    if (!resumeLink) {
+        alert('Please enter a link for your resume.');
         return;
     }
 
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Uploading...';
+    submitBtn.textContent = 'Updating...';
 
     try {
-        const resumeLink = await uploadFile(resumeFile, `resumes/${resumeFile.name}`);
         if (resumeLink) {
             await saveToFirestore('settings', 'main', { resumeLink });
             alert('Resume updated successfully!');
+        } else {
+            throw new Error("Resume link was empty.");
         }
     } finally {
         submitBtn.disabled = false;
@@ -862,21 +882,22 @@ async function handleProfileImageSubmit(e) {
     e.preventDefault();
     const form = e.target;
     const submitBtn = form.querySelector('button[type="submit"]');
-    const profileImageFile = document.getElementById('profile-image-file').files[0];
+    const imageUrl = document.getElementById('profile-image-link').value;
 
-    if (!profileImageFile) {
-        alert('Please select a profile picture to upload.');
+    if (!imageUrl) {
+        alert('Please enter a link for your profile picture.');
         return;
     }
 
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Uploading...';
+    submitBtn.textContent = 'Updating...';
 
     try {
-        const imageUrl = await uploadFile(profileImageFile, `profile-images/${profileImageFile.name}`);
         if (imageUrl) {
             await saveToFirestore('settings', 'main', { profileImageUrl: imageUrl });
             alert('Profile picture updated successfully!');
+        } else {
+            throw new Error("Image URL was empty.");
         }
     } finally {
         submitBtn.disabled = false;
@@ -941,4 +962,3 @@ async function uploadFile(file, path) {
         return null;
     }
 }
-
