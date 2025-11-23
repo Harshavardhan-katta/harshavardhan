@@ -46,8 +46,8 @@
                     <input type="hidden" id="skill-id">
                     <input type="text" id="skill-name" placeholder="Skill Name (e.g., JavaScript)" required>
                     <input type="number" id="skill-level" placeholder="Proficiency Level (1-100)" min="1" max="100" required>
-                    <label for="skill-logo">Skill Logo (optional, overwrites existing)</label>
-                    <input type="file" id="skill-logo" accept="image/*">
+                    <label for="skill-logo-url">Skill Logo URL</label>
+                    <input type="url" id="skill-logo-url" placeholder="https://example.com/logo.png">
                     <button type="submit" class="btn">Add/Update Skill</button>
                 </form>
                 <div id="skills-list" class="items-list"></div>
@@ -61,8 +61,8 @@
                     <input type="text" id="project-title" placeholder="Project Title" required>
                     <textarea id="project-desc" placeholder="Project Description" required></textarea>
                     <input type="url" id="project-link" placeholder="Project Link (e.g., https://github.com/...)" required>
-                    <label for="project-image">Project Images (optional, will replace existing)</label>
-                    <input type="file" id="project-image" accept="image/*" multiple>
+                    <label for="project-image-urls">Project Image URLs (one per line)</label>
+                    <textarea id="project-image-urls" placeholder="https://example.com/image1.png&#10;https://example.com/image2.png" rows="3"></textarea>
                     <button type="submit" class="btn">Add/Update Project</button>
                 </form>
                 <div id="projects-list" class="items-list"></div>
@@ -72,14 +72,14 @@
             <section class="dashboard-card">
                 <h3>General Settings</h3>
                 <form id="resume-form">
-                    <label for="resume-file">Upload New Resume</label>
-                    <input type="file" id="resume-file" accept=".pdf,.doc,.docx">
+                    <label for="resume-link">Update Resume Link</label>
+                    <input type="url" id="resume-link" placeholder="Enter public link to your resume PDF">
                     <button type="submit" class="btn">Update Resume</button>
                 </form>
                 <hr style="margin: 20px 0;">
                 <form id="profile-image-form">
-                    <label for="profile-image-file">Upload New Profile Picture</label>
-                    <input type="file" id="profile-image-file" accept="image/*">
+                    <label for="profile-image-link">Update Profile Picture Link</label>
+                    <input type="url" id="profile-image-link" placeholder="Enter public link to your profile picture">
                     <button type="submit" class="btn">Update Picture</button>
                 </form>
             </section>
