@@ -459,13 +459,17 @@ function renderResumeLink(resumeLink) {
  * @param {string} imageUrl - The URL of the profile image.
  */
 function renderProfileImage(imageUrl) {
+    const fallbackImageUrl = 'harsha.jpg'; // The local fallback image
     const imgElement = document.getElementById('home-profile-img');
     if (imgElement) {
         if (imageUrl) {
             imgElement.src = imageUrl;
             console.log(`Profile image updated to: ${imageUrl}`);
+        } else {
+            console.warn('No profile image URL found in settings. Using fallback image.');
+            imgElement.src = fallbackImageUrl;
         }
-        // If no imageUrl, it will just use the default src from the HTML.
+        imgElement.onerror = () => { imgElement.src = fallbackImageUrl; }; // If the URL from Firebase is broken, use fallback.
     }
 }
 
@@ -932,7 +936,7 @@ async function getFromFirestore(collectionName, docId) {
 async function saveToFirestore(collectionName, docId, data) {
     try {
         await db.collection(collectionName).doc(docId).set(data, { merge: true });
-        console.log(`[Firestore] Saved to '${collectionName}/${docId}':`, data);
+        console.log(`[Firestore] Successfully saved to '${collectionName}/${docId}':`, data);
     } catch (error) {
         console.error(`[Firestore] Error saving document '${collectionName}/${docId}':`, error);
     }
