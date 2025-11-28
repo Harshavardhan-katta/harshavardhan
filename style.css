@@ -86,6 +86,30 @@ body {
     transform: translateY(0);
 }
 
+/* --- Maintenance Page --- */
+#maintenance-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 100vh;
+    width: 100%;
+    background-color: #f4f7fc;
+}
+
+.maintenance-content i {
+    font-size: 4rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.maintenance-content h1 {
+    font-family: var(--font-primary);
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+
 /* --- Loader --- */
 #loader {
     position: fixed;
@@ -238,7 +262,7 @@ nav ul li a:hover {
 /* --- Skills Section --- */
 .skills-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(25px, 0.5fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 30px;
     justify-content: center; /* This will center the items in the grid */
 }
@@ -255,8 +279,8 @@ nav ul li a:hover {
 .skill-card .skill-logo {
     width: 60px;
     height: 60px;
-    object-fit: contain;
-    margin: 0 auto 05px;
+    object-fit: contain; /* Ensures logo is not stretched */
+    margin: 0 auto 5px;
     display: block;
 }
 
@@ -269,6 +293,7 @@ nav ul li a:hover {
     font-family: var(--font-primary);
     margin-bottom: 15px;
 }
+
 
 /* --- Projects Section --- */
 .projects-grid {
@@ -614,9 +639,57 @@ footer {
 .item-actions .edit-btn { color: var(--secondary-color); }
 .item-actions .delete-btn { color: #e74c3c; }
 
+.setting-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.setting-toggle label {
+    font-weight: 500;
+}
+
+/* Simple checkbox toggle switch */
+.setting-toggle input[type="checkbox"] {
+    position: relative;
+    width: 40px;
+    height: 20px;
+    -webkit-appearance: none;
+    appearance: none; /* Hide default checkbox */
+    background-color: #ccc;
+    outline: none;
+    border-radius: 20px;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+.setting-toggle input[type="checkbox"]::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    background-color: white;
+    transition: transform 0.3s;
+}
+
+.setting-toggle input[type="checkbox"]:checked {
+    background-color: var(--primary-color);
+}
+
 .next {
     right: 0;
     border-radius: 3px 0 0 3px;
+}
+
+.setting-toggle input[type="checkbox"]:checked::before {
+    transform: translateX(20px);
 }
 
 @media (max-width: 768px) {
