@@ -310,10 +310,23 @@ async function loadPublicData() {
     // and profile image URL.
     try {
         const settings = await getFromFirestore('settings', 'main');
-        renderProfileImage(settings?.profileImageUrl);
-        renderResumeLink(settings?.resumeLink || 'resume.pdf');
+
+        // Check for maintenance mode first
+        if (settings?.isMaintenanceMode) {
+            console.log('Maintenance mode is ON. Hiding main content.');
+            document.getElementById('maintenance-page').style.display = 'flex';
+            document.getElementById('main-content').style.display = 'none';
+            // Hide loader immediately
+            const loader = document.getElementById('loader');
+            if (loader) loader.style.display = 'none';
+        } else {
+            // If not in maintenance mode, load everything else
+            renderProfileImage(settings?.profileImageUrl);
+            renderResumeLink(settings?.resumeLink || 'resume.pdf');
+        }
     } catch (err) {
         console.warn('Error loading public settings:', err);
+        // Fallback in case of error
         renderResumeLink('resume.pdf'); // fallback
     }
 }
@@ -328,6 +341,7 @@ function renderSkills(skills) {
         console.error('Skills container element with ID "skills-container" not found! Cannot load skills.');
         return;
     }
+    skillsContainer.innerHTML = ''; // Clear existing skills
     // The container is now cleared inside the Firebase listener to protect static content.
     if (skills.length === 0) {
         // If the function is called with no skills, do nothing.
@@ -592,11 +606,13 @@ function setupAdminEventListeners() {
     const projectForm = document.getElementById('project-form');
     const resumeForm = document.getElementById('resume-form');
     const profileImageForm = document.getElementById('profile-image-form');
+    const settingsForm = document.getElementById('settings-form');
 
     if (skillForm) skillForm.addEventListener('submit', handleSkillSubmit);
     if (projectForm) projectForm.addEventListener('submit', handleProjectSubmit);
     if (resumeForm) resumeForm.addEventListener('submit', handleResumeSubmit);
     if (profileImageForm) profileImageForm.addEventListener('submit', handleProfileImageSubmit);
+    if (settingsForm) settingsForm.addEventListener('submit', handleSettingsSubmit);
 
     document.getElementById('skills-list')?.addEventListener('click', (e) => {
         const button = e.target.closest('button');
@@ -657,7 +673,12 @@ function showLogin() {
 
 async function loadDashboardData() {
     const settings = await getFromFirestore('settings', 'main');
-    // The resume link is now handled by the file input, no display field needed here.
+    if (settings) {
+        const maintenanceToggle = document.getElementById('maintenance-mode-toggle');
+        if (maintenanceToggle) {
+            maintenanceToggle.checked = settings.isMaintenanceMode || false;
+        }
+    }
 }
 
 // --- Skill Management ---
@@ -910,6 +931,29 @@ async function handleProfileImageSubmit(e) {
     }
 }
 
+async function handleSettingsSubmit(e) {
+    e.preventDefault();
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const maintenanceToggle = document.getElementById('maintenance-mode-toggle');
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Saving...';
+
+    try {
+        const settingsData = {
+            isMaintenanceMode: maintenanceToggle.checked
+        };
+        await saveToFirestore('settings', 'main', settingsData);
+        alert('Site settings updated successfully!');
+    } catch (error) {
+        console.error("Error saving site settings:", error);
+        alert('Failed to save settings.');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Save Settings';
+    }
+}
 // ===================================================================================
 //
 //                                  UTILITY FUNCTIONS
