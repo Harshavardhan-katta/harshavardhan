@@ -255,7 +255,7 @@ nav ul li a:hover {
 .about-content {
     max-width: 800px;
     margin: 0 auto;
-    text-align: center;
+    text-align: justify;
     font-size: 1.1rem;
 }
 
@@ -754,3 +754,4 @@ footer {
         order: -1; /* Move menu button to the far left */
     }
 }
+
