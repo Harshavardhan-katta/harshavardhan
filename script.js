@@ -4,12 +4,12 @@
 //
 // ===================================================================================
 
-// PASTE YOUR FIREBASE CONFIG OBJECT HERE
+
 const firebaseConfig = {
   apiKey: "AIzaSyBNXfGkXkPEJHLkrS2Z8PzWyIaF5ZNubT4",
   authDomain: "harshavardhan-4d3fd.firebaseapp.com",
   projectId: "harshavardhan-4d3fd",
-  storageBucket: "harshavardhan-4d3fd.appspot.com", // ✅ fixed
+  storageBucket: "harshavardhan-4d3fd.appspot.com", 
   messagingSenderId: "695874804149",
   appId: "1:695874804149:web:ed535cc400bb3276b561fc",
   measurementId: "G-GJBT7R1XFB"
@@ -1010,3 +1010,4 @@ async function uploadFile(file, path) {
         return null;
     }
 }
+
