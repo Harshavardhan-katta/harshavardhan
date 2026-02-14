@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☠️</text></svg>">
     <link rel="stylesheet" href="style.css">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -63,6 +63,8 @@
                     <input type="url" id="project-link" placeholder="Project Link (e.g., https://github.com/...)" required>
                     <label for="project-image-urls">Project Image URLs (one per line)</label>
                     <textarea id="project-image-urls" placeholder="https://example.com/image1.png&#10;https://example.com/image2.png" rows="3"></textarea>
+                    <label for="project-video">YouTube Embed Code or URL</label>
+                    <textarea id="project-video" placeholder="Paste full <iframe> embed code or a YouTube share URL (https://youtu.be/xxxx or https://www.youtube.com/watch?v=xxxx)" rows="2"></textarea>
                     <button type="submit" class="btn">Add/Update Project</button>
                 </form>
                 <div id="projects-list" class="items-list"></div>
