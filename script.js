@@ -1,10 +1,8 @@
-// ===================================================================================
 //
 //                                  FIREBASE SETUP
 //
-// ===================================================================================
 
-
+// PASTE YOUR FIREBASE CONFIG OBJECT HERE
 const firebaseConfig = {
   apiKey: "AIzaSyBNXfGkXkPEJHLkrS2Z8PzWyIaF5ZNubT4",
   authDomain: "harshavardhan-4d3fd.firebaseapp.com",
@@ -23,7 +21,6 @@ const db = firebase.firestore();
 const functions = firebase.functions(); // Initialize Cloud Functions
 const storage = firebase.storage(); // Initialize Firebase Storage
 
-// ===================================================================================
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOMContentLoaded event fired. Attempting to hide loader.');
 
@@ -409,17 +406,45 @@ function renderProjects(projects) {
     projects.forEach(project => {
         const projectCard = document.createElement('div');
         projectCard.className = 'project-card';
+        // Build a unified media slides array (video first, then images)
+        const mediaSlides = [];
+        if (project.videoEmbed) {
+            mediaSlides.push({ type: 'video', html: project.videoEmbed });
+        }
+        if (project.imageUrls && project.imageUrls.length > 0) {
+            project.imageUrls.forEach(url => mediaSlides.push({ type: 'image', url }));
+        }
 
-        // Use the first image as the cover, or a placeholder
+        // Always show a cover image (first image if available, otherwise placeholder)
         const coverImage = (project.imageUrls && project.imageUrls.length > 0)
             ? project.imageUrls[0]
             : 'https://via.placeholder.com/400x200';
 
-        // Add project image
-        const projectImage = document.createElement('img');
-        projectImage.src = coverImage;
-        projectImage.alt = project.title;
-        projectImage.className = 'project-image';
+        const projectImageEl = document.createElement('img');
+        projectImageEl.src = coverImage;
+        projectImageEl.alt = project.title;
+        projectImageEl.className = 'project-image';
+        projectCard.appendChild(projectImageEl);
+
+        // If a video is present, add a small play overlay on the cover
+        if (project.videoEmbed) {
+            const playOverlay = document.createElement('button');
+            playOverlay.className = 'play-overlay';
+            playOverlay.innerHTML = '<i class="fas fa-play"></i>';
+            playOverlay.title = 'Play Video';
+            playOverlay.onclick = (e) => {
+                e.stopPropagation();
+                openMediaGallery(mediaSlides);
+            };
+            // Positioning handled via CSS (we'll add styles)
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'relative';
+            wrapper.appendChild(projectImageEl.cloneNode());
+            wrapper.appendChild(playOverlay);
+            // Replace appended image with wrapper
+            projectCard.removeChild(projectImageEl);
+            projectCard.appendChild(wrapper);
+        }
 
         const cardContent = document.createElement('div');
         cardContent.className = 'card-content';
@@ -438,12 +463,12 @@ function renderProjects(projects) {
 
         cardContent.append(projectTitle, projectDesc);
 
-        // Add a gallery button if there are multiple images
-        if (project.imageUrls && project.imageUrls.length > 1) {
+        // Add a gallery/media button if there are multiple media items or a video
+        if (mediaSlides.length > 1 || (mediaSlides.length === 1 && mediaSlides[0].type === 'video')) {
             const galleryBtn = document.createElement('button');
             galleryBtn.className = 'btn btn-gallery';
-            galleryBtn.textContent = 'View Gallery';
-            galleryBtn.onclick = () => openGallery(project.imageUrls);
+            galleryBtn.textContent = mediaSlides.length > 1 ? 'View Media' : 'Play Video';
+            galleryBtn.onclick = () => openMediaGallery(mediaSlides);
             cardContent.append(galleryBtn);
         }
 
@@ -525,17 +550,38 @@ let slideIndex = 1;
  * @param {string[]} imageUrls - Array of image URLs for the project.
  */
 function openGallery(imageUrls) {
+    // Backwards-compatible wrapper: if called with an array of URLs create image slides
+    const slides = (imageUrls && imageUrls.length > 0 && typeof imageUrls[0] === 'string')
+        ? imageUrls.map(url => ({ type: 'image', url }))
+        : [];
+    openMediaGallery(slides);
+}
+
+/**
+ * Opens the gallery modal for mixed media slides (images and videos).
+ * @param {Array} slides - Array of objects: {type: 'image'|'video', url?, html?}
+ */
+function openMediaGallery(slides) {
     const modal = document.getElementById('gallery-modal');
     const modalImagesContainer = modal.querySelector('.modal-images');
-    modalImagesContainer.innerHTML = ''; // Clear previous images
+    modalImagesContainer.innerHTML = ''; // Clear previous slides
 
-    imageUrls.forEach(url => {
-        const imgDiv = document.createElement('div');
-        imgDiv.className = 'modal-slide';
-        const img = document.createElement('img');
-        img.src = url;
-        imgDiv.appendChild(img);
-        modalImagesContainer.appendChild(imgDiv);
+    slides.forEach(slide => {
+        const slideDiv = document.createElement('div');
+        slideDiv.className = 'modal-slide';
+        if (slide.type === 'image') {
+            const img = document.createElement('img');
+            img.src = slide.url;
+            slideDiv.appendChild(img);
+        } else if (slide.type === 'video') {
+            // Insert the provided embed HTML (iframe) or raw html
+            // Wrap in a responsive container for consistency
+            const wrapper = document.createElement('div');
+            wrapper.className = 'modal-video-embed';
+            wrapper.innerHTML = slide.html;
+            slideDiv.appendChild(wrapper);
+        }
+        modalImagesContainer.appendChild(slideDiv);
     });
 
     modal.style.display = 'block';
@@ -557,11 +603,11 @@ function showSlides(n) {
     slides[slideIndex - 1].style.display = 'block';
 }
 
-// ===================================================================================
+
 //
 //                                  ADMIN / DASHBOARD LOGIC
 //
-// ===================================================================================
+
 
 function initAdminPage() {
     auth.onAuthStateChanged(user => {
@@ -780,6 +826,7 @@ async function handleProjectSubmit(e) {
         const description = document.getElementById('project-desc').value;
         const link = document.getElementById('project-link').value;
         const imageUrlsText = document.getElementById('project-image-urls').value;
+        const projectVideoText = document.getElementById('project-video')?.value || '';
         const projectData = { title, description, link };
 
         // If the user entered any URLs, split them by newline, trim whitespace, and filter out empty lines.
@@ -791,9 +838,28 @@ async function handleProjectSubmit(e) {
             projectData.imageUrls = imageUrls;
         }
 
+        // If the admin provided a YouTube URL or full iframe embed, normalize to an iframe string
+        if (projectVideoText) {
+            // If it already looks like an iframe, store as-is
+            if (projectVideoText.trim().startsWith('<iframe')) {
+                projectData.videoEmbed = projectVideoText.trim();
+            } else {
+                // Try to extract YouTube video ID from common URL formats
+                const ytIdMatch = projectVideoText.match(/(?:v=|\/)([A-Za-z0-9_-]{11})/);
+                const shortMatch = projectVideoText.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
+                const id = (ytIdMatch && ytIdMatch[1]) || (shortMatch && shortMatch[1]);
+                if (id) {
+                    projectData.videoEmbed = `<iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                } else {
+                    // Fallback: store raw text so admin can paste embed code later
+                    projectData.videoEmbed = projectVideoText.trim();
+                }
+            }
+        }
+
         if (id) {
             // When updating, merge new data with existing data.
-            // This prevents overwriting imageUrls if no new images are uploaded.
+            // This prevents overwriting fields if no new values are provided.
             await db.collection('projects').doc(id).set(projectData, { merge: true });
         } else {
             await db.collection('projects').add(projectData);
@@ -861,6 +927,13 @@ async function editProject(id) {
             // Join the array of URLs into a string with newlines for the textarea
             if (imageUrlsField && project.imageUrls) {
                 imageUrlsField.value = project.imageUrls.join('\n');
+            } else if (imageUrlsField) {
+                imageUrlsField.value = '';
+            }
+            // Populate video/embed field if present
+            const videoField = document.getElementById('project-video');
+            if (videoField) {
+                videoField.value = project.videoEmbed || '';
             }
         }
     } catch (error) {
@@ -1010,4 +1083,3 @@ async function uploadFile(file, path) {
         return null;
     }
 }
-
