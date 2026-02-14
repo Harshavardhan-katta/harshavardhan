@@ -323,6 +323,25 @@ nav ul li a:hover {
     object-fit: cover;
 }
 
+/* Responsive video embed inside project cards */
+.project-card .project-video {
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    position: relative;
+    overflow: hidden;
+}
+.project-card .project-video iframe,
+.project-card .project-video embed,
+.project-card .project-video video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
 .project-card .card-content {
     padding: 25px;
     flex-grow: 1;
@@ -492,6 +511,44 @@ footer {
     max-height: 80vh;
     object-fit: contain;
 }
+
+/* Modal video embed wrapper */
+.modal-video-embed {
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 */
+    position: relative;
+}
+.modal-video-embed iframe,
+.modal-video-embed embed,
+.modal-video-embed video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+/* Play overlay on project cover */
+.play-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+.project-card > div[style] img { width: 100%; height: 200px; object-fit: cover; display: block; }
 
 .close-modal {
     color: #fff;
@@ -675,7 +732,7 @@ footer {
     border-radius: 50%;
     top: 2px;
     left: 2px;
-    background-color: white;
+    background-color: rgb(248, 246, 246);
     transition: transform 0.3s;
 }
 
@@ -755,3 +812,26 @@ footer {
     }
 }
 
+.animated-bg {
+    background: linear-gradient(
+        -45deg,
+        #ee7752,
+        #e73c7e,
+        #23a6d5,
+        #23d5ab
+    );
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
