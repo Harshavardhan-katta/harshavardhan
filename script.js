@@ -2,16 +2,26 @@
 //                                  FIREBASE SETUP
 //
 
-// PASTE YOUR FIREBASE CONFIG OBJECT HERE
-const firebaseConfig = {
-  apiKey: "AIzaSyBNXfGkXkPEJHLkrS2Z8PzWyIaF5ZNubT4",
-  authDomain: "harshavardhan-4d3fd.firebaseapp.com",
-  projectId: "harshavardhan-4d3fd",
-  storageBucket: "harshavardhan-4d3fd.appspot.com", 
-  messagingSenderId: "695874804149",
-  appId: "1:695874804149:web:ed535cc400bb3276b561fc",
-  measurementId: "G-GJBT7R1XFB"
-};
+
+
+// Try to load from external config file first (for production)
+let firebaseConfig = window.FIREBASE_CONFIG;
+
+// If not found, try to load from config.js (for local development)
+if (!firebaseConfig && typeof window !== 'undefined') {
+  // This will be automatically loaded if config.js exists in the same directory
+  firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_ID",
+    appId: "YOUR_APP_ID",
+    measurementId: "YOUR_MEASUREMENT_ID"
+  };
+  
+  console.warn('Firebase config not properly configured. Please follow SECURITY.md instructions.');
+}
 
 
 // Initialize Firebase (compat libs used in index.html)
@@ -420,11 +430,20 @@ function renderProjects(projects) {
             ? project.imageUrls[0]
             : 'https://via.placeholder.com/400x200';
 
+        // Create image wrapper container
+        let imageWrapper = document.createElement('div');
+        imageWrapper.className = 'project-image-wrapper';
+        imageWrapper.style.position = 'relative';
+
         const projectImageEl = document.createElement('img');
         projectImageEl.src = coverImage;
         projectImageEl.alt = project.title;
         projectImageEl.className = 'project-image';
-        projectCard.appendChild(projectImageEl);
+        projectImageEl.onerror = function() {
+            // Fallback if image URL fails to load
+            this.src = 'https://via.placeholder.com/400x200';
+        };
+        imageWrapper.appendChild(projectImageEl);
 
         // If a video is present, add a small play overlay on the cover
         if (project.videoEmbed) {
@@ -436,19 +455,13 @@ function renderProjects(projects) {
                 e.stopPropagation();
                 openMediaGallery(mediaSlides);
             };
-            // Positioning handled via CSS (we'll add styles)
-            const wrapper = document.createElement('div');
-            wrapper.style.position = 'relative';
-            wrapper.appendChild(projectImageEl.cloneNode());
-            wrapper.appendChild(playOverlay);
-            // Replace appended image with wrapper
-            projectCard.removeChild(projectImageEl);
-            projectCard.appendChild(wrapper);
+            imageWrapper.appendChild(playOverlay);
         }
+
+        projectCard.appendChild(imageWrapper);
 
         const cardContent = document.createElement('div');
         cardContent.className = 'card-content';
-        cardContent.style.position = 'relative'; // For gallery button positioning
 
         const projectTitle = document.createElement('h3');
         projectTitle.textContent = project.title;
@@ -473,7 +486,7 @@ function renderProjects(projects) {
         }
 
         cardContent.append(projectLink); // Add project link at the end
-        projectCard.append(projectImage, cardContent);
+        projectCard.append(cardContent);
         projectsContainer.appendChild(projectCard);
         console.log(`Added project: ${project.title}`); // Debug log
     });
@@ -845,11 +858,32 @@ async function handleProjectSubmit(e) {
                 projectData.videoEmbed = projectVideoText.trim();
             } else {
                 // Try to extract YouTube video ID from common URL formats
-                const ytIdMatch = projectVideoText.match(/(?:v=|\/)([A-Za-z0-9_-]{11})/);
-                const shortMatch = projectVideoText.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
-                const id = (ytIdMatch && ytIdMatch[1]) || (shortMatch && shortMatch[1]);
-                if (id) {
-                    projectData.videoEmbed = `<iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                let videoId = null;
+                
+                // Handle youtu.be short URLs
+                const shortUrlMatch = projectVideoText.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
+                if (shortUrlMatch) {
+                    videoId = shortUrlMatch[1];
+                }
+                
+                // Handle full youtube.com URLs with v= parameter
+                if (!videoId) {
+                    const fullUrlMatch = projectVideoText.match(/[?&]v=([A-Za-z0-9_-]{11})/);
+                    if (fullUrlMatch) {
+                        videoId = fullUrlMatch[1];
+                    }
+                }
+                
+                // Handle /v/ format
+                if (!videoId) {
+                    const vFormatMatch = projectVideoText.match(/\/v\/([A-Za-z0-9_-]{11})/);
+                    if (vFormatMatch) {
+                        videoId = vFormatMatch[1];
+                    }
+                }
+                
+                if (videoId) {
+                    projectData.videoEmbed = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
                 } else {
                     // Fallback: store raw text so admin can paste embed code later
                     projectData.videoEmbed = projectVideoText.trim();
