@@ -531,6 +531,20 @@ footer {
 }
 
 /* Play overlay on project cover */
+.project-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.project-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
 .play-overlay {
     position: absolute;
     top: 50%;
@@ -547,7 +561,17 @@ footer {
     border: none;
     cursor: pointer;
     font-size: 1.2rem;
+    transition: all 0.3s ease;
+    z-index: 10;
 }
+
+.play-overlay:hover {
+    background: rgba(0,0,0,0.8);
+    width: 72px;
+    height: 72px;
+    font-size: 1.4rem;
+}
+
 .project-card > div[style] img { width: 100%; height: 200px; object-fit: cover; display: block; }
 
 .close-modal {
