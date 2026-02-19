@@ -206,7 +206,7 @@ header {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 1.8rem;
+    font-size: 2.2rem;
     font-weight: 700;
     font-family: var(--font-primary);
     text-decoration: none;
@@ -214,7 +214,7 @@ header {
 }
 
 .site-logo {
-    height: 40px;
+    height: 80px;
     width: auto;
     display: block;
 }
