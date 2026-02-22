@@ -2,26 +2,16 @@
 //                                  FIREBASE SETUP
 //
 
-
-
-// Try to load from external config file first (for production)
-let firebaseConfig = window.FIREBASE_CONFIG;
-
-// If not found, try to load from config.js (for local development)
-if (!firebaseConfig && typeof window !== 'undefined') {
-  // This will be automatically loaded if config.js exists in the same directory
-  firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_ID",
-    appId: "YOUR_APP_ID",
-    measurementId: "YOUR_MEASUREMENT_ID"
-  };
-  
-  console.warn('Firebase config not properly configured. Please follow SECURITY.md instructions.');
-}
+const firebaseConfig = window.FIREBASE_CONFIG || {
+ 
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "", 
+  messagingSenderId: "",
+  appId: "",
+  measurementId: ""
+};
 
 
 // Initialize Firebase (compat libs used in index.html)
@@ -64,42 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 0); // 0ms delay pushes it to the end of the event queue
 });
 
-// ===================================================================================
-//
-//                                  PUBLIC PAGE LOGIC (index.html)
-//
-// ===================================================================================
-
-// --- DEFAULT DATA (FALLBACK) ---
-const defaultSkills = [
-    { id: 'default-js', name: 'JavaScript', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png' },
-    { id: 'default-html', name: 'HTML5', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/61/HTML5_logo_and_wordmark.svg' },
-    { id: 'default-css', name: 'CSS3', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/3d/CSS.3.svg' },
-    { id: 'default-react', name: 'React', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg' },
-    { id: 'default-firebase', name: 'Firebase', logoUrl: 'https://www.gstatic.com/devrel-devsite/prod/v857595300a87c7e04314232241e975453df6a21814252443423c686d82d4af44/firebase/images/touchicon-180.png' }
-];
-
-const defaultProjects = [
-    {
-        id: 'default-p1',
-        title: 'Sample Project One',
-        description: 'This is a great sample project showcasing web development skills. It includes a gallery with multiple images.',
-        link: 'https://github.com/Harshavardhan-katta',
-        imageUrls: [
-            'https://via.placeholder.com/400x200/6a11cb/ffffff?text=Image+1',
-            'https://via.placeholder.com/800x600/2575fc/ffffff?text=Gallery+Image+2',
-            'https://via.placeholder.com/800x600/333333/ffffff?text=Gallery+Image+3'
-        ]
-    },
-    {
-        id: 'default-p2',
-        title: 'Sample Project Two',
-        description: 'Another example of a project, this one demonstrates a different set of capabilities and has a single cover image.',
-        link: 'https://github.com/Harshavardhan-katta',
-        imageUrls: ['https://via.placeholder.com/400x200/e83e8c/ffffff?text=Project+Two']
-    }
-];
-
 /**
  * Initializes all functionality for the main portfolio page.
  */
@@ -111,12 +65,7 @@ function initIndexPage() {
     setupTypingAnimation(); // Start the typing animation last.
     loadPublicData();
 
-    // --- RENDER DEFAULTS IMMEDIATELY ---
-    // We now use static HTML for all default content. The JS will only
-    // render content if it's successfully loaded from Firebase.
-    // The following lines are removed to prevent overwriting the static HTML.
-    // renderSkills(defaultSkills); 
-    // renderProjects(defaultProjects);
+  
 
     // --- FIREBASE REAL-TIME LISTENERS ---
     db.collection('skills').orderBy('name').onSnapshot(snapshot => {
@@ -430,20 +379,11 @@ function renderProjects(projects) {
             ? project.imageUrls[0]
             : 'https://via.placeholder.com/400x200';
 
-        // Create image wrapper container
-        let imageWrapper = document.createElement('div');
-        imageWrapper.className = 'project-image-wrapper';
-        imageWrapper.style.position = 'relative';
-
         const projectImageEl = document.createElement('img');
         projectImageEl.src = coverImage;
         projectImageEl.alt = project.title;
         projectImageEl.className = 'project-image';
-        projectImageEl.onerror = function() {
-            // Fallback if image URL fails to load
-            this.src = 'https://via.placeholder.com/400x200';
-        };
-        imageWrapper.appendChild(projectImageEl);
+        projectCard.appendChild(projectImageEl);
 
         // If a video is present, add a small play overlay on the cover
         if (project.videoEmbed) {
@@ -455,13 +395,19 @@ function renderProjects(projects) {
                 e.stopPropagation();
                 openMediaGallery(mediaSlides);
             };
-            imageWrapper.appendChild(playOverlay);
+            // Positioning handled via CSS (we'll add styles)
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'relative';
+            wrapper.appendChild(projectImageEl.cloneNode());
+            wrapper.appendChild(playOverlay);
+            // Replace appended image with wrapper
+            projectCard.removeChild(projectImageEl);
+            projectCard.appendChild(wrapper);
         }
-
-        projectCard.appendChild(imageWrapper);
 
         const cardContent = document.createElement('div');
         cardContent.className = 'card-content';
+        cardContent.style.position = 'relative'; // For gallery button positioning
 
         const projectTitle = document.createElement('h3');
         projectTitle.textContent = project.title;
@@ -486,7 +432,7 @@ function renderProjects(projects) {
         }
 
         cardContent.append(projectLink); // Add project link at the end
-        projectCard.append(cardContent);
+        projectCard.append(projectImage, cardContent);
         projectsContainer.appendChild(projectCard);
         console.log(`Added project: ${project.title}`); // Debug log
     });
@@ -858,32 +804,11 @@ async function handleProjectSubmit(e) {
                 projectData.videoEmbed = projectVideoText.trim();
             } else {
                 // Try to extract YouTube video ID from common URL formats
-                let videoId = null;
-                
-                // Handle youtu.be short URLs
-                const shortUrlMatch = projectVideoText.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
-                if (shortUrlMatch) {
-                    videoId = shortUrlMatch[1];
-                }
-                
-                // Handle full youtube.com URLs with v= parameter
-                if (!videoId) {
-                    const fullUrlMatch = projectVideoText.match(/[?&]v=([A-Za-z0-9_-]{11})/);
-                    if (fullUrlMatch) {
-                        videoId = fullUrlMatch[1];
-                    }
-                }
-                
-                // Handle /v/ format
-                if (!videoId) {
-                    const vFormatMatch = projectVideoText.match(/\/v\/([A-Za-z0-9_-]{11})/);
-                    if (vFormatMatch) {
-                        videoId = vFormatMatch[1];
-                    }
-                }
-                
-                if (videoId) {
-                    projectData.videoEmbed = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                const ytIdMatch = projectVideoText.match(/(?:v=|\/)([A-Za-z0-9_-]{11})/);
+                const shortMatch = projectVideoText.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
+                const id = (ytIdMatch && ytIdMatch[1]) || (shortMatch && shortMatch[1]);
+                if (id) {
+                    projectData.videoEmbed = `<iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
                 } else {
                     // Fallback: store raw text so admin can paste embed code later
                     projectData.videoEmbed = projectVideoText.trim();
@@ -1061,11 +986,7 @@ async function handleSettingsSubmit(e) {
         submitBtn.textContent = 'Save Settings';
     }
 }
-// ===================================================================================
-//
-//                                  UTILITY FUNCTIONS
-//
-// ===================================================================================
+
 
 async function getFromFirestore(collectionName, docId) {
     try {
