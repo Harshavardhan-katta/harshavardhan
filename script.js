@@ -432,7 +432,7 @@ function renderProjects(projects) {
         }
 
         cardContent.append(projectLink); // Add project link at the end
-        projectCard.append(projectImage, cardContent);
+        projectCard.append(cardContent);
         projectsContainer.appendChild(projectCard);
         console.log(`Added project: ${project.title}`); // Debug log
     });
@@ -1038,3 +1038,4 @@ async function uploadFile(file, path) {
         return null;
     }
 }
+
