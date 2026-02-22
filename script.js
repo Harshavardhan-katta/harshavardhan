@@ -2,8 +2,9 @@
 //                                  FIREBASE SETUP
 //
 
+// PASTE YOUR FIREBASE CONFIG OBJECT HERE
 const firebaseConfig = window.FIREBASE_CONFIG || {
- 
+
   apiKey: "",
   authDomain: "",
   projectId: "",
@@ -986,7 +987,11 @@ async function handleSettingsSubmit(e) {
         submitBtn.textContent = 'Save Settings';
     }
 }
-
+// ===================================================================================
+//
+//                                  UTILITY FUNCTIONS
+//
+// ===================================================================================
 
 async function getFromFirestore(collectionName, docId) {
     try {
@@ -1038,4 +1043,3 @@ async function uploadFile(file, path) {
         return null;
     }
 }
-
