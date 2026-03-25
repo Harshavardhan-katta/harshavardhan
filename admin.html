@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<title>Harsha-Admin</title>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -98,6 +97,12 @@
                     <button type="submit" class="btn">Save Settings</button>
                 </form>
             </section>
+
+            <!-- Messages Inbox -->
+            <section class="dashboard-card">
+                <h3>Visitor Messages</h3>
+                <div id="messages-list" class="items-list" style="max-height: 300px; overflow-y: auto;"></div>
+            </section>
         </main>
     </div>
 
@@ -108,10 +113,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-functions-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
 
-    <!-- Load Firebase config BEFORE script.js -->
     <script src="config.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
-
-
