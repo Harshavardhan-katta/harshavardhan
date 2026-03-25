@@ -19,7 +19,7 @@
     <!-- Loading Screen -->
     
     <div id="loader">
-        <img src="logo_1.png" alt="HarshaVardhan logo" class="loader-logo">
+        <img src="logo.png" alt="HarshaVardhan logo" class="loader-logo">
         <div class="spinner"></div>
     </div>
 
@@ -36,13 +36,16 @@
     <!-- Header & Navigation -->
     <header>
         <a href="#home" class="logo">
-            <img src="logo_1.png" alt="HarshaVardhan" class="site-logo">
+            <img src="logo.png" alt="HarshaVardhan" class="site-logo">
             <span class="visually-hidden">HarshaVardhan</span>
         </a>
         <nav>
             <ul class="nav-links">
                 <li><a href="#home">Home</a></li>
                 <li><a href="#about">About</a></li>
+                <li><a href="#Education">Education</a></li>
+                <li><a href="#experience">Experience</a></li>
+                <li><a href="#whm">Why hire me </a></li>
                 <li><a href="#skills">Skills</a></li>
                 <li><a href="#projects">Projects</a></li>
                 <li><a href="#contact">Contact</a></li>
@@ -59,11 +62,12 @@
                 <p>I'm a B.tech  Student |<span class="typing-text"></span></p>
                 <div class="buttons">
                     <a id="cv-btn" href="resume.pdf" target="_blank" class="btn">Download CV</a>
-                    <a href="#contact" class="btn btn-secondary">Contact Me</a>
+                    <button id="view-resume-btn" class="btn btn-secondary" type="button">View Resume</button>
                 </div>
             </div>
             <div class="home-img">
                 <img id="home-profile-img" src="" alt="Katta Harsha Vardhan">
+                
             </div>
         </section>
 
@@ -74,6 +78,122 @@
                 <p>
 Hello, I'm Harshavardhan Katta, a passionate B.Tech student in Computer Science and Engineering (AI & ML) at Kalasalingam Academy of Research and Education, with a strong interest in solving real-world problems through technology. I'm a quick learner, a good team player, and always eager to explore new ideas and contribute to meaningful, tech-driven solutions.
                 </p>
+            </div>
+        </section>
+
+        <!-- Education Section -->
+        <section id="Education" class="content-section">
+            <h2 class="section-title">Education</h2>
+            <div class="education-timeline">
+                <div class="education-item">
+                    <div class="education-year">2021 - Present</div>
+                    <div class="education-content">
+                        <h3>B.Tech in Computer Science and Engineering (AI & ML)</h3>
+                        <p class="education-institution">Kalasalingam Academy of Research and Education</p>
+                        <p class="education-description">Currently pursuing B.Tech with focus on Artificial Intelligence and Machine Learning. Actively involved in various technical projects and hackathons.</p>
+                    </div>
+                </div>
+                <div class="education-item">
+                    <div class="education-year">2019 - 2021</div>
+                    <div class="education-content">
+                        <h3>Intermediate (MPC)</h3>
+                        <p class="education-institution">Sri Chaitanya Junior College</p>
+                        <p class="education-description">Completed intermediate education with Mathematics, Physics, and Chemistry as core subjects. Scored 95% in board examinations.</p>
+                    </div>
+                </div>
+                <div class="education-item">
+                    <div class="education-year">2018 - 2019</div>
+                    <div class="education-content">
+                        <h3>10th Standard (SSC)</h3>
+                        <p class="education-institution">Shree Bharathi English Medium School</p>
+                        <p class="education-description">Completed 10th standard with distinction. Developed strong foundation in mathematics and science subjects.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section id="experience" class="content-section">
+            <h2 class="section-title">Experience</h2>
+            <div class="experience-timeline">
+                <div class="experience-item">
+                    <div class="experience-year">2023 - Present</div>
+                    <div class="experience-content">
+                        <h3>Technical Team Member</h3>
+                        <p class="experience-company">Various Open Source Projects</p>
+                        <p class="experience-description">Contributing to open source projects, developing web applications, and learning modern development practices. Collaborated with teams on real-world projects.</p>
+                        <ul class="experience-highlights">
+                            <li>Developed responsive web applications using HTML, CSS, and JavaScript</li>
+                            <li>Implemented Firebase for backend services and data management</li>
+                            <li>Participated in hackathons and coding competitions</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="experience-item">
+                    <div class="experience-year">2025 - Present</div>
+                    <div class="experience-content">
+                        <h3>Internal Member</h3>
+                        <p class="experience-company">IUCEE KARE Student Chapter</p>
+                        <p class="experience-description">Active internal member of the technical Chapter, organizing workshops and helping fellow students with programming concepts and project development.</p>
+                        <ul class="experience-highlights">
+                            <li>Conducted workshops on web development and programming fundamentals</li>
+                            <li>Mentored junior students in coding and project development</li>
+                            <li>Organized technical events and Peer-Peer Sessions</li>
+                        </ul>
+                    </div>
+                </div>
+               <!----<div class="experience-item"> 
+                    <div class="experience-year">2021 - 2022</div>
+                    <div class="experience-content">
+                        <h3>Freelance Developer</h3>
+                        <p class="experience-company">Self-Employed</p>
+                        <p class="experience-description">Started learning web development and created personal projects. Built portfolio websites and small applications for local clients.</p>
+                        <ul class="experience-highlights">
+                            <li>Built responsive websites using modern web technologies</li>
+                            <li>Learned version control with Git and GitHub</li>
+                            <li>Gained experience in client communication and project management</li>
+                        </ul>
+                    </div> -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Hire Me Section -->
+        <section id="whm" class="content-section">
+            <h2 class="section-title">Why Hire Me</h2>
+            <div class="why-hire-me-content">
+                <div class="why-hire-me-grid">
+                    <div class="why-hire-me-item">
+                        <i class="fas fa-lightbulb"></i>
+                        <h3>Innovative Thinker</h3>
+                        <p>I bring fresh perspectives and creative solutions to complex problems. My background in AI & ML allows me to approach challenges with both technical expertise and innovative thinking.</p>
+                    </div>
+                    <div class="why-hire-me-item">
+                        <i class="fas fa-users"></i>
+                        <h3>Team Player</h3>
+                        <p>I excel in collaborative environments and have experience working with diverse teams. I'm always ready to contribute my skills while learning from others.</p>
+                    </div>
+                    <div class="why-hire-me-item">
+                        <i class="fas fa-rocket"></i>
+                        <h3>Quick Learner</h3>
+                        <p>Technology evolves rapidly, and I'm committed to staying current. I quickly adapt to new tools, frameworks, and methodologies to deliver cutting-edge solutions.</p>
+                    </div>
+                    <div class="why-hire-me-item">
+                        <i class="fas fa-code"></i>
+                        <h3>Passionate Developer</h3>
+                        <p>My passion for coding drives me to create efficient, scalable, and user-friendly applications. I take pride in writing clean, maintainable code.</p>
+                    </div>
+                    <div class="why-hire-me-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <h3>Strong Foundation</h3>
+                        <p>With a solid educational background in Computer Science and AI/ML, combined with hands-on project experience, I'm well-equipped to tackle real-world challenges.</p>
+                    </div>
+                    <div class="why-hire-me-item">
+                        <i class="fas fa-handshake"></i>
+                        <h3>Reliable & Dedicated</h3>
+                        <p>I believe in delivering quality work on time and maintaining open communication throughout the development process. You can count on me to get the job done right.</p>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -119,7 +239,7 @@ Hello, I'm Harshavardhan Katta, a passionate B.Tech student in Computer Science 
 
     <!-- Footer -->
     <footer>
-        <p>Copyright © 2025 Harsha Vardhan. All Rights Reserved</p>
+        <p>Copyright &copy; 2025 Harsha Vardhan. All Rights Reserved.</p>
     </footer>
 
     <!-- Back to Top Button -->
@@ -134,6 +254,23 @@ Hello, I'm Harshavardhan Katta, a passionate B.Tech student in Computer Science 
             </div>
             <a class="prev">&#10094;</a>
             <a class="next">&#10095;</a>
+        </div>
+    </div>
+
+    <!-- Resume Modal -->
+    <div id="resume-modal" class="modal">
+        <div class="resume-modal-content">
+            <div class="resume-modal-header">
+                <h2>My Resume</h2>
+                <div class="modal-controls">
+                    <button class="modal-btn minimize-btn" title="Minimize">−</button>
+                    <button class="modal-btn maximize-btn" title="Maximize">□</button>
+                    <button class="modal-btn close-btn close-resume-modal" title="Close">×</button>
+                </div>
+            </div>
+            <div class="resume-modal-body">
+                <iframe src="Resume.pdf" width="100%" height="600px" style="border: none;"></iframe>
+            </div>
         </div>
     </div>
     </div>
@@ -151,4 +288,3 @@ Hello, I'm Harshavardhan Katta, a passionate B.Tech student in Computer Science 
     </div>
 </body>
 </html>
-
