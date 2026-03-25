@@ -34,6 +34,15 @@ document.addEventListener('DOMContentLoaded', () => {
             loader.style.display = 'none';
             console.log('Loader hidden after transition.');
         }, { once: true });
+
+        // Safe fallback: hide loader after 1.5 seconds if transitionend doesn't fire
+        setTimeout(() => {
+            if (loader.style.display !== 'none') {
+                loader.style.opacity = '0';
+                loader.style.display = 'none';
+                console.warn('Loader fallback hide applied after timeout.');
+            }
+        }, 1500);
     } else {
         console.warn('Loader element with ID "loader" not found. Page might remain on loading screen.');
     }
@@ -129,6 +138,9 @@ function setupEventListeners() {
         // Add listener for the gallery modal
         setupGalleryModal();
 
+        // Add listener for the resume modal
+        setupResumeModal();
+
     } else {
         console.warn('Mobile menu elements (menu-btn or nav ul) not found. Check index.html IDs/classes.'); // Debug log
     }
@@ -158,38 +170,89 @@ function setupEventListeners() {
                 submitBtn.textContent = 'Sending...';
             }
 
-            // Prepare the data to send to the Cloud Function
             const formData = {
                 name: contactForm.name.value,
                 email: contactForm.email.value,
                 message: contactForm.message.value,
             };
 
-            // Call the Cloud Function (if you have it deployed)
+            let emailSent = false;
+            let sendError = '';
+
             try {
                 const sendEmail = functions.httpsCallable('sendEmail');
                 await sendEmail(formData);
+                emailSent = true;
             } catch (err) {
-                console.warn('sendEmail Cloud Function failed or not configured:', err);
-                // Even if the function fails, we show a success message for the demo
+                console.error('sendEmail Cloud Function failed or not configured:', err);
+                if (err.code === 'internal' || err.code === 'not-found' || err.code === 'unavailable') {
+                    sendError = 'Email function not configured yet. Message stored in Firestore.';
+                } else {
+                    sendError = err.message || 'Failed to send email. Please try again later.';
+                }
             }
-            
-            // Show the success message and hide the form
-            if (formStatus) {
-                formStatus.innerHTML = 'Thank you for your message! I will get back to you shortly. 😊';
-            }
-            contactForm.classList.add('form-submitted');
 
-            // Reset the form after a delay
-            setTimeout(() => {
+            // Save in Firestore messages collection for admin dashboard tracking
+            let dbSaved = false;
+            let dbError = '';
+            try {
+                await db.collection('messages').add({
+                    name: formData.name,
+                    email: formData.email,
+                    message: formData.message,
+                    sentEmail: emailSent,
+                    status: 'new',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                });
+                dbSaved = true;
+            } catch (err) {
+                console.error('Failed to save message in Firestore:', err);
+                dbError = err.message || 'Failed saving to Firestore.';
+            }
+
+            if (formStatus) {
+                formStatus.style.opacity = '1';
+                if (emailSent && dbSaved) {
+                    formStatus.style.color = 'green';
+                    formStatus.innerHTML = '✅ Message sent and saved. I will contact you shortly.';
+                    contactForm.classList.add('form-submitted');
+                } else if (!emailSent && dbSaved) {
+                    formStatus.style.color = 'green';
+                    formStatus.innerHTML = `⚠️ Email not available yet, but your message is saved. I will contact you shortly.`;
+                    contactForm.classList.add('form-submitted');
+                } else if (emailSent && !dbSaved) {
+                    formStatus.style.color = 'orange';
+                    formStatus.innerHTML = `⚠️ Email sent but storing failed: ${dbError}`;
+                } else {
+                    formStatus.style.color = 'red';
+                    formStatus.innerHTML = `❌ Cannot send message: ${sendError || dbError}`;
+                }
+            }
+
+            // Refresh control state
+            const resetForm = () => {
                 contactForm.reset();
                 contactForm.classList.remove('form-submitted');
-
                 if (submitBtn) {
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Send Message';
                 }
-            }, 4000); // 4-second delay before resetting
+                if (formStatus && emailSent) {
+                    setTimeout(() => {
+                        formStatus.innerHTML = '';
+                        formStatus.style.opacity = '0';
+                    }, 3500);
+                }
+            };
+
+            if (emailSent || dbSaved) {
+                resetForm();
+            } else {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Send Message';
+                }
+            }
         });
     }
 }
@@ -493,11 +556,11 @@ function setupGalleryModal() {
     const prevBtn = modal.querySelector('.prev');
 
     closeModalBtn.onclick = () => modal.style.display = 'none';
-    window.onclick = (event) => {
-        if (event.target == modal) {
+    window.addEventListener('click', (event) => {
+        if (event.target === modal) {
             modal.style.display = 'none';
         }
-    };
+    });
 
     nextBtn.onclick = () => plusSlides(1);
     prevBtn.onclick = () => plusSlides(-1);
@@ -569,6 +632,95 @@ function showSlides(n) {
 //
 
 
+function setupResumeModal() {
+    const modal = document.getElementById('resume-modal');
+    const viewResumeBtn = document.getElementById('view-resume-btn');
+    const closeModalBtn = modal?.querySelector('.close-resume-modal');
+    const minimizeBtn = modal?.querySelector('.minimize-btn');
+    const maximizeBtn = modal?.querySelector('.maximize-btn');
+    const closeBtn = modal?.querySelector('.close-btn');
+
+    let isMaximized = false;
+    let originalSize = {};
+
+    if (!modal || !viewResumeBtn) {
+        return;
+    }
+
+    const modalContent = modal.querySelector('.resume-modal-content');
+
+    const closeModal = () => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        if (isMaximized) {
+            restoreModal();
+        }
+    };
+
+    const restoreModal = () => {
+        Object.assign(modalContent.style, {
+            width: originalSize.width,
+            maxWidth: originalSize.maxWidth,
+            height: originalSize.height,
+            maxHeight: originalSize.maxHeight,
+            margin: originalSize.margin
+        });
+        maximizeBtn.textContent = '□';
+        maximizeBtn.title = 'Maximize';
+        isMaximized = false;
+    };
+
+    viewResumeBtn.onclick = () => {
+        if (modalContent && !isMaximized) {
+            originalSize = {
+                width: modalContent.style.width || '90%',
+                maxWidth: modalContent.style.maxWidth || '900px',
+                height: modalContent.style.height || 'auto',
+                maxHeight: modalContent.style.maxHeight || '90vh',
+                margin: modalContent.style.margin || '2% auto'
+            };
+        }
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    };
+
+    closeModalBtn?.addEventListener('click', closeModal);
+    closeBtn?.addEventListener('click', closeModal);
+
+    minimizeBtn?.addEventListener('click', () => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    });
+
+    maximizeBtn?.addEventListener('click', () => {
+        if (!modalContent) return;
+        if (!isMaximized) {
+            modalContent.style.width = '98%';
+            modalContent.style.maxWidth = '98%';
+            modalContent.style.height = '95vh';
+            modalContent.style.maxHeight = '95vh';
+            modalContent.style.margin = '1% auto';
+            maximizeBtn.textContent = '❐';
+            maximizeBtn.title = 'Restore';
+            isMaximized = true;
+        } else {
+            restoreModal();
+        }
+    });
+
+    window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && modal.style.display === 'block') {
+            closeModal();
+        }
+    });
+}
+
 function initAdminPage() {
     auth.onAuthStateChanged(user => {
         if (user) {
@@ -582,6 +734,8 @@ function initAdminPage() {
 
     setupAdminEventListeners();
 
+    setupAdminMessageViewer();
+
     db.collection('skills').orderBy('name').onSnapshot(snapshot => {
         const skills = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderSkillsList(skills);
@@ -594,6 +748,70 @@ function initAdminPage() {
         renderProjectsList(projects);
     }, error => {
         console.error("Error fetching projects for admin list: ", error);
+    });
+}
+
+function setupAdminMessageViewer() {
+    const messagesList = document.getElementById('messages-list');
+    if (!messagesList) return;
+
+    auth.onAuthStateChanged(user => {
+        if (!user) {
+            messagesList.innerHTML = '<p>Please login to view messages.</p>';
+            return;
+        }
+
+        messagesList.innerHTML = '<p>Loading messages...</p>';
+
+        db.collection('messages').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+            messagesList.innerHTML = '';
+            if (snapshot.empty) {
+                messagesList.innerHTML = '<p>No messages yet.</p>';
+                return;
+            }
+
+            snapshot.forEach(doc => {
+                const msg = doc.data();
+                const item = document.createElement('div');
+                item.className = 'item-entry';
+                item.innerHTML = `
+                    <div style="flex:1; margin-right: 10px;">
+                        <strong>${msg.name || 'Anonymous'}</strong> <small>(${msg.email || 'n/a'})</small><br>
+                        <small>${msg.createdAt ? new Date(msg.createdAt.toDate()).toLocaleString() : ''}</small>
+                        <p style="margin: 8px 0;">${msg.message || ''}</p>
+                        <small>Status: ${msg.status || 'new'} | Email ${msg.sentEmail ? 'sent' : 'failed'}</small>
+                    </div>
+                    <div class="item-actions" style="display:flex; gap:6px; align-items:center;">
+                        <button class="btn btn-secondary" data-action="mark-read" data-id="${doc.id}">Mark Read</button>
+                        <button class="btn delete-btn" data-action="delete" data-id="${doc.id}">Delete</button>
+                    </div>
+                `;
+
+                messagesList.appendChild(item);
+            });
+
+            messagesList.querySelectorAll('button').forEach(button => {
+                button.addEventListener('click', async (event) => {
+                    const action = button.dataset.action;
+                    const id = button.dataset.id;
+                    if (!id) return;
+
+                    if (action === 'mark-read') {
+                        await db.collection('messages').doc(id).update({ status: 'read' });
+                    }
+
+                    if (action === 'delete') {
+                        if (confirm('Delete this message?')) {
+                            await db.collection('messages').doc(id).delete();
+                        }
+                    }
+                });
+            });
+
+        }, error => {
+            console.error('Error loading messages:', error);
+            messagesList.innerHTML = '<p>Error loading messages.</p>';
+        });
     });
 }
 
@@ -987,11 +1205,11 @@ async function handleSettingsSubmit(e) {
         submitBtn.textContent = 'Save Settings';
     }
 }
-// ===================================================================================
+
 //
 //                                  UTILITY FUNCTIONS
 //
-// ===================================================================================
+
 
 async function getFromFirestore(collectionName, docId) {
     try {
