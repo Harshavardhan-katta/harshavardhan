@@ -335,6 +335,37 @@ nav ul li a:hover {
     display: block;
 }
 
+/* Top skills under profile image */
+.top-skills {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.top-skills .skill-logo {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.top-skills .skill-logo:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+.top-skills .skill-logo i {
+    font-size: 22px;
+}
+
 .skill-card:hover {
     transform: translateY(-10px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
@@ -581,6 +612,94 @@ footer {
     border: 0;
 }
 
+/* --- Resume Modal Styling --- */
+#resume-modal {
+    display: none;
+    position: fixed;
+    z-index: 2001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(3px);
+}
+
+.resume-modal-content {
+    background-color: #fff;
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    margin: 2% auto;
+    border-radius: 15px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    animation: modalSlideIn 0.35s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.resume-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: #fff;
+    padding: 14px 18px;
+}
+
+.resume-modal-header h2 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-family: var(--font-primary);
+}
+
+.modal-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.modal-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    border: none;
+    background: rgba(255, 255, 255, 0.18);
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.modal-btn:hover {
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.close-btn:hover {
+    background: #ff4d4e;
+}
+
+.resume-modal-body {
+    padding: 0;
+    max-height: calc(90vh - 60px);
+    overflow-y: auto;
+    background: #fff;
+}
+
+.resume-modal-body iframe {
+    width: 100%;
+    height: 82vh;
+    border: none;
+}
+
 /* Play overlay on project cover */
 .play-overlay {
     position: absolute;
@@ -798,6 +917,252 @@ footer {
 
 .setting-toggle input[type="checkbox"]:checked::before {
     transform: translateX(20px);
+}
+
+/* --- Education Section --- */
+.education-timeline {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.education-timeline::before {
+    content: '';
+    position: absolute;
+    left: 30px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+}
+
+.education-item {
+    display: flex;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.education-year {
+    min-width: 120px;
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    margin-right: 30px;
+    padding-top: 5px;
+}
+
+.education-content {
+    background: var(--card-bg);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    flex: 1;
+    position: relative;
+}
+
+.education-content::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 25px;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 20px solid var(--card-bg);
+}
+
+.education-content h3 {
+    font-family: var(--font-primary);
+    color: var(--primary-color);
+    margin-bottom: 5px;
+    font-size: 1.3rem;
+}
+
+.education-institution {
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.education-description {
+    color: #666;
+    line-height: 1.6;
+}
+
+/* --- Experience Section --- */
+.experience-timeline {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.experience-timeline::before {
+    content: '';
+    position: absolute;
+    left: 30px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+}
+
+.experience-item {
+    display: flex;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.experience-year {
+    min-width: 120px;
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    margin-right: 30px;
+    padding-top: 5px;
+}
+
+.experience-content {
+    background: var(--card-bg);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    flex: 1;
+    position: relative;
+}
+
+.experience-content::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 25px;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 20px solid var(--card-bg);
+}
+
+.experience-content h3 {
+    font-family: var(--font-primary);
+    color: var(--primary-color);
+    margin-bottom: 5px;
+    font-size: 1.3rem;
+}
+
+.experience-company {
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.experience-description {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.experience-highlights {
+    list-style: none;
+    padding: 0;
+}
+
+.experience-highlights li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 8px;
+    color: #555;
+}
+
+.experience-highlights li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* --- Why Hire Me Section --- */
+.why-hire-me-content {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.why-hire-me-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.why-hire-me-item {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.why-hire-me-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.why-hire-me-item i {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.why-hire-me-item h3 {
+    font-family: var(--font-primary);
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+
+.why-hire-me-item p {
+    color: #666;
+    line-height: 1.6;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+    .education-item, .experience-item {
+        flex-direction: column;
+    }
+    
+    .education-year, .experience-year {
+        margin-bottom: 15px;
+        margin-right: 0;
+    }
+    
+    .education-timeline::before, .experience-timeline::before {
+        left: 20px;
+    }
+    
+    .education-content::before, .experience-content::before {
+        left: -15px;
+        border-right: 15px solid var(--card-bg);
+        border-top: 7px solid transparent;
+        border-bottom: 7px solid transparent;
+    }
+    
+    .why-hire-me-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .home-section {
+        flex-direction: column;
+        text-align: center;
+        padding: 100px 5%;
+    }
+    
+    .home-content .buttons {
+        justify-content: center;
+    }
 }
 
 @media (max-width: 768px) {
